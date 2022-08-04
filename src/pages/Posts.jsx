@@ -8,7 +8,7 @@ import MyLoader from "../components/UI/loader/MyLoader";
 import MyModal from "../components/UI/modals/MyModal";
 import MyPagination from "../components/UI/pagination/MyPagination";
 import getPagesCount from "../components/utils/pages";
-import { UseFetching } from "../hooks/useFetching";
+import { useFetching } from "../hooks/useFetching";
 import { usePosts } from "../hooks/usePosts";
 import "../styles/App.css";
 
@@ -21,7 +21,7 @@ function Posts() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
 
-  const [fetchPosts, isPostsLoading, postError] = UseFetching(async () => {
+  const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
     const response = await PostService.getAll(limit, page);
     setPosts(response.data);
     const totalCount = response.headers['x-total-count'];
