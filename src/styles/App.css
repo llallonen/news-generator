@@ -23,6 +23,10 @@
   margin-top: 15px;
 }
 
+.post__content {
+  width: 70%;
+}
+
 .post-enter {
   transform: translateX(0px);
 }
@@ -39,6 +43,12 @@
 .post-exit-active {
   transform: translateX(-350px);
   transition: all 500ms ease-in;
+}
+
+.post__btns {
+  display: flex;
+  justify-content: space-around;
+  width: 220px;
 }
 
 .err-message {
