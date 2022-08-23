@@ -1,4 +1,4 @@
-import { default as React, useEffect, useState } from "react";
+import { default as React, useEffect, useRef, useState } from "react";
 import PostService from "../API/PostService";
 import PostFilter from "../components/PostFilter";
 import PostForm from "../components/PostForm";
@@ -9,6 +9,7 @@ import MyModal from "../components/UI/modals/MyModal";
 import MyPagination from "../components/UI/pagination/MyPagination";
 import getPagesCount from "../components/utils/pages";
 import { useFetching } from "../hooks/useFetching";
+import { useObserver } from "../hooks/useObserver";
 import { usePosts } from "../hooks/usePosts";
 import "../styles/App.css";
 
@@ -20,14 +21,18 @@ function Posts() {
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const lastElement = useRef();
 
   const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
     const response = await PostService.getAll(limit, page);
-    setPosts(response.data);
+    setPosts([...posts, ...response.data]);
     const totalCount = response.headers['x-total-count'];
     setTotalPages(getPagesCount(totalCount, limit));
   })
 
+  useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+    setPage(page + 1)
+  })
   useEffect(() => {
     console.log('start')
     fetchPosts(limit, page)
@@ -63,11 +68,13 @@ function Posts() {
         {postError &&
           <h2>An error {postError} has occurred</h2>
         }
-        {isPostsLoading
-          ? <MyLoader />
-          : <div style={{ marginTop: '20px' }}>
-            <PostList remove={removePost} posts={selectedSortedPosts} title='Posts list 1' />
-          </div>
+        <div style={{ marginTop: '20px' }}>
+          <PostList remove={removePost} posts={selectedSortedPosts} title='Posts list 1' />
+          <div ref={lastElement} style={{ height: 20, background: "lightsalmon" }}></div>
+        </div>
+
+        {isPostsLoading &&
+          <MyLoader />
         }
         <MyPagination
           page={page}
